@@ -71,8 +71,7 @@ fun createSign(parameters: SortedMap<String, Any>): String {
     val sb = StringBuffer()
     sb.append(getParams(parameters))
     sb.append(getSignKey())
-    val sign = MD5Util.MD5Encode(sb.toString(), "utf-8")
-    return sign
+    return MD5Util.MD5Encode(sb.toString(), "utf-8")
 }
 
 

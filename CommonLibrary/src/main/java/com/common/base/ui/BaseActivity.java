@@ -28,8 +28,10 @@ import android.widget.Toast;
 import com.common.ShiHuiActivityManager;
 import com.common.annotation.ActivityFragmentInject;
 import com.common.base.presenter.BasePresenter;
+import com.common.utils.TimeUtil;
 import com.flyco.dialog.widget.NormalDialog;
 import com.flyco.dialog.widget.base.BaseDialog;
+import com.socks.library.KLog;
 import com.views.ProgressWheel;
 import com.views.ViewsHelper;
 import com.views.util.ToastUtil;
@@ -91,6 +93,8 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     protected Toolbar toolbar;
     protected Dialog default_loading_dialog;
     protected OnClickBack onClickBack;
+
+    private long lastClickTime = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +162,22 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         setIntent(intent);
     }
 
+    @Override
+    final public void onClick(View v) {
+        if (checkTimeClickable()) onViewClick(v);
+    }
+
+    final public boolean checkTimeClickable(){
+        long nowClickTime = System.currentTimeMillis();
+        if(nowClickTime - lastClickTime > TimeUtil.CLICKABLE_TIME){
+            lastClickTime = nowClickTime;
+            return true;
+        }
+        lastClickTime = nowClickTime;
+        return false;
+    }
+
+    protected abstract void onViewClick(View view);
 
     private void initToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -336,8 +356,15 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         }
     }
 
-    protected ActionBar getToolbar() {
-        return getSupportActionBar();
+
+    abstract class MyOnClickListener implements View.OnClickListener {
+        @Override
+        final public void onClick(View v) {
+            if (checkTimeClickable()) onViewClick(v);
+        }
+
+        abstract void onViewClick(View view);
     }
 
 }
+

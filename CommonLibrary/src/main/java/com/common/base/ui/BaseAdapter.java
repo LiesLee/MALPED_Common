@@ -17,12 +17,16 @@ import java.util.List;
  * 文档: https://github.com/CymChad/BaseRecyclerViewAdapterHelper/wiki/%E9%A6%96%E9%A1%B5
  * Created by LiesLee on 16/9/19.
  */
-public abstract class BaseAdapter<T> extends BaseQuickAdapter<T> {
+public abstract class BaseAdapter<T, E extends BaseViewHolder> extends BaseQuickAdapter<T, E> {
+    /** 当前列表的总数量 */
+    public int mCurrentCounter = 0;
 
 
-    public BaseAdapter(Context ctx, int layoutResId, List<T> data) {
+    public BaseAdapter(int layoutResId, List<T> data) {
         super(layoutResId, data);
-        ViewsHelper.initLoadMoreLayout(ctx, this);
+        //ViewsHelper.initLoadMoreLayout(ctx, this);
+       setEnableLoadMore(data!=null && data.size() > ViewsHelper.OPEN_LOAD_MORE_SIZE);
+        mCurrentCounter = getData().size();
     }
 
     /**
@@ -30,33 +34,24 @@ public abstract class BaseAdapter<T> extends BaseQuickAdapter<T> {
      * @param data
      */
     public void setData(List<T> data){
-        if (data != null && data.size() > 0){
-            setNewData(data);
-            openLoadMore(getData().size());
-        }else{
-            setNewData(new ArrayList<T>());
-        }
+        setNewData(data == null ? new ArrayList<T>() : data);
+        mCurrentCounter = getData().size();
+        setEnableLoadMore(getData().size() > ViewsHelper.OPEN_LOAD_MORE_SIZE);
 
     }
 
     /**
-     * 在尾部添加数据
-     * @param data
+     * 添加更多数据
+     * @param data  数据
+     * @param totalCounter  服务器最大数
      */
-    public void addNewData(List<T> data){
-//        loadComplete();
-        if (data != null && data.size() > 0){
-            addData(data);
-//            if(data.size() > 0){
-//                openLoadMore(getData().size());
-//            }
-        }else{
-            loadComplete();
-            if(getData() != null && getData().size() > 0){
-                View view = mLayoutInflater.inflate(R.layout.load_more_failed_end, (ViewGroup)null);
-                setLoadMoreFailedView(view);
-                showLoadMoreFailedView();
-            }
+    public void addNewData(List<T> data, int totalCounter){
+        addData(data == null ? new ArrayList<T>() : data);
+        //加载完毕
+        loadMoreComplete();
+        mCurrentCounter = getData().size();
+        if(mCurrentCounter >= totalCounter){
+            loadMoreEnd(getData().size() < ViewsHelper.OPEN_LOAD_MORE_SIZE);
         }
     }
 

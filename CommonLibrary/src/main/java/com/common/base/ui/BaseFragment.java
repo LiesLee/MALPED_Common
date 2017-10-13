@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.common.annotation.ActivityFragmentInject;
 import com.common.base.presenter.BasePresenter;
+import com.common.utils.TimeUtil;
 import com.views.util.ToastUtil;
 
 
@@ -23,6 +24,7 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment
     protected T mPresenter;
     protected View fragmentRootView;
     protected int mContentViewId;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,9 +49,14 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment
         baseFragment = this;
         baseActivity = (BaseActivity) baseFragment.getActivity();
         ButterKnife.bind(this, fragmentRootView);
-        initView(fragmentRootView);
-        initData();
         return fragmentRootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView(view);
+        initData();
     }
 
     @Override
@@ -115,4 +122,12 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment
     protected View findViewById(int id){
         return fragmentRootView == null ? null : fragmentRootView.findViewById(id);
     }
+
+
+    @Override
+    final public void onClick(View v) {
+        if(baseActivity.checkTimeClickable()) onViewClick(v);
+    }
+
+    protected abstract void onViewClick(View view);
 }

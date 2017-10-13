@@ -1,1 +1,1 @@
-include ':ETC-M_App', ':Ultra-Pull-To-Refresh', ':CommonLibrary'
+include ':ETC-M_App', ':CommonLibrary'

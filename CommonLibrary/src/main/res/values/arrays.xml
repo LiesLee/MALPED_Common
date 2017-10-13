@@ -18,4 +18,11 @@
         <item>@color/yellow</item>
         <item>@color/green</item>
     </integer-array>
+
+    <integer-array name="Material_colors">
+        <item>@color/material_blue</item>
+        <item>@color/material_green</item>
+        <item>@color/material_yellow</item>
+    </integer-array>
+
 </resources>

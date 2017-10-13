@@ -54,15 +54,19 @@ fun <T> httpRequestDefault(observable: Observable<HttpResult<T>>, baseView: Base
 
             override fun onError(e: Throwable?) {
                 checkBack {
-                    if (e is HttpException) {             //HTTP错误
-                        KLog.e(e.getLocalizedMessage() + "\n" + e)
-                        it.requestError(e.code(), e.getLocalizedMessage() + "\n" + e)
-                    } else if (e is SocketTimeoutException) {
-                        KLog.e("请求超时：\n" + e)
-                        it.requestError(1, "似乎网络不太给力哦~")
-                    } else {
-                        e?.apply { KLog.e(getLocalizedMessage() + "\n" + e) }
-                        it.requestError(2, "似乎链接不上哦，请稍后再试~")
+                    when (e) {
+                        is HttpException -> {             //HTTP错误
+                            KLog.e(e.getLocalizedMessage() + "\n" + e)
+                            it.requestError(e.code(), e.getLocalizedMessage() + "\n" + e)
+                        }
+                        is SocketTimeoutException -> {
+                            KLog.e("请求超时：\n" + e)
+                            it.requestError(1, "似乎网络不太给力哦~")
+                        }
+                        else -> {
+                            e?.apply { KLog.e(getLocalizedMessage() + "\n" + e) }
+                            it.requestError(2, "似乎链接不上哦，请稍后再试~")
+                        }
                     }
                 }
             }

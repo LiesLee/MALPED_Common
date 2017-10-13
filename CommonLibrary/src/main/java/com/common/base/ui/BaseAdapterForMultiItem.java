@@ -19,12 +19,15 @@ import java.util.List;
  * 文档: https://github.com/CymChad/BaseRecyclerViewAdapterHelper/wiki/%E9%A6%96%E9%A1%B5
  * 领取奖励  特殊 adapter
  */
-public abstract class BaseAdapterForMultiItem<T extends MultiItemEntity> extends BaseMultiItemQuickAdapter<T> {
+public abstract class BaseAdapterForMultiItem<T extends MultiItemEntity, E extends BaseViewHolder> extends BaseMultiItemQuickAdapter<T, E> {
 
+
+    private int mCurrentCounter = 0;
 
     public BaseAdapterForMultiItem(Context ctx, List<T> data) {
         super(data);
-        ViewsHelper.initLoadMoreLayout(ctx, this);
+        setEnableLoadMore(data!=null && data.size() > ViewsHelper.OPEN_LOAD_MORE_SIZE);
+        mCurrentCounter = getData().size();
     }
 
     /*
@@ -32,12 +35,9 @@ public abstract class BaseAdapterForMultiItem<T extends MultiItemEntity> extends
      * @param data
      */
     public void setData(List<T> data){
-        if (data != null && data.size() > 0){
-            setNewData(data);
-            openLoadMore(getData().size());
-        }else{
-            setNewData(new ArrayList<T>());
-        }
+        setNewData(data == null ? new ArrayList<T>() : data);
+        mCurrentCounter = getData().size();
+        setEnableLoadMore(getData().size() > ViewsHelper.OPEN_LOAD_MORE_SIZE);
 
     }
 
@@ -45,20 +45,13 @@ public abstract class BaseAdapterForMultiItem<T extends MultiItemEntity> extends
      * 在尾部添加数据
      * @param data
      */
-    public void addNewData(List<T> data){
-//        loadComplete();
-        if (data != null && data.size() > 0){
-            addData(data);
-//            if(data.size() > 0){
-//                openLoadMore(getData().size());
-//            }
-        }else{
-            loadComplete();
-            if(getData() != null && getData().size() > 0){
-                View view = mLayoutInflater.inflate(R.layout.load_more_failed_end, (ViewGroup)null);
-                setLoadMoreFailedView(view);
-                showLoadMoreFailedView();
-            }
+    public void addNewData(List<T> data, int totalCounter){
+        addData(data == null ? new ArrayList<T>() : data);
+        //加载完毕
+        loadMoreComplete();
+        mCurrentCounter = getData().size();
+        if(mCurrentCounter >= totalCounter){
+            loadMoreEnd(getData().size() < ViewsHelper.OPEN_LOAD_MORE_SIZE);
         }
     }
 

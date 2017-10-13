@@ -50,4 +50,8 @@
     <color name="possible_result_points">#c0ffff00</color>
     <color name="layout_bg">#efefef</color>
 
+    <color name="material_blue">#1094f3</color>
+    <color name="material_green">#75bd30</color>
+    <color name="material_yellow">#feec16</color>
+
 </resources>

@@ -1,13 +1,20 @@
 package com.gzqm.etcm.module.common.ui.activity
 
+import android.app.FragmentManager
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.view.View
+import com.common.ShiHuiActivityManager
 import com.common.annotation.ActivityFragmentInject
 import com.common.base.presenter.BasePresenterImpl
 import com.common.base.ui.BaseActivity
 import com.common.base.ui.BaseTakePhotoActivity
 import com.gzqm.etcm.R
+import com.gzqm.etcm.module.home.ui.fragment.HomeFragment
+import com.gzqm.etcm.module.itinerary.ui.fragment.ItineraryFragment
+import com.gzqm.etcm.module.my.ui.fragment.MyFragment
 import com.jph.takephoto.model.TImage
 import com.jph.takephoto.model.TResult
 import com.socks.library.KLog
@@ -20,64 +27,92 @@ import org.json.JSONObject
  * Email: LiesLee@foxmail.com
  */
 @ActivityFragmentInject(contentViewId = R.layout.act_main, toolbarTitle = R.string.app_name)
-class MainActivity : BaseTakePhotoActivity<BasePresenterImpl<*>>(){
+class MainActivity : BaseActivity<BasePresenterImpl<*>>() {
 
-    val list = ArrayList<TImage>(0)
 
-    override fun currentCount(): Int {
-        return list.size
-    }
+    var homeFragment: HomeFragment? = null
+    var itineraryFragment: ItineraryFragment? = null
+    var myfragment: MyFragment? = null
 
-    override fun takeCancel() {
-
-    }
-
-    override fun takeSuccess(result: TResult?) {
-        result?.apply {
-            list.addAll(this.images)
-        }
-    }
-
-    override fun getMaxCount(): Int {
-        return 9
-    }
-
-    override fun takeFail(result: TResult?, msg: String?) {
-        KLog.e(msg)
-    }
 
     override fun initData() {
 
     }
 
     override fun initView() {
-        tv_title.setOnClickListener{
-            showSelectePhotoItems()
+        homeFragment = HomeFragment()
+
+        val hide = { fragment: Fragment? ->
+            fragment?.apply {
+                supportFragmentManager.beginTransaction().hide(this).commitAllowingStateLoss()
+            }
+
+        }
+        val show = { fragment: Fragment? ->
+            fragment?.apply {
+                supportFragmentManager.beginTransaction().show(this).commitAllowingStateLoss()
+            }
+
+        }
+        val add = { fragment: Fragment? ->
+            fragment?.apply {
+                supportFragmentManager.beginTransaction().add(R.id.fl_fragment, this).commitAllowingStateLoss()
+            }
+
         }
 
-        tv_compress.setOnClickListener{
-            showProgress(0)
-            compressImages(1024*500, list){ isSuccess: Boolean, results: Collection<String>?, msg: String ->
-                val jo = JSONObject()
-                val ja = JSONArray()
+        add(homeFragment)
 
-                if (results != null) {
-                    for (s in results){
-                        ja.put(s)
-                    }
+        rg_main.setOnCheckedChangeListener { group, checkedId ->
+
+            when (checkedId) {
+                R.id.rb_home -> {
+                    //先隐藏
+                    hide(itineraryFragment)
+                    hide(myfragment)
+                    if (homeFragment == null) {
+                        homeFragment = HomeFragment()
+                        add(homeFragment)
+                    } else show(homeFragment)
+
+
                 }
-                jo.put("isCompressSuccess", isSuccess)
-                jo.put("results", ja)
-                jo.put("msg", msg)
+                R.id.rb_find -> {
+                    if (itineraryFragment == null) {
+                        itineraryFragment = ItineraryFragment()
+                        add(itineraryFragment)
+                    } else show(itineraryFragment)
+                }
 
-                KLog.json(jo.toString())
-
-                hideProgress(0)
+                R.id.rb_person -> {
+                    if(myfragment == null){
+                        myfragment = MyFragment()
+                        add(myfragment)
+                    }else show(myfragment)
+                }
             }
         }
-     }
 
-    override fun onClick(v: View?) {
+        tv_title.setOnClickListener(this)
+    }
+    var count = 0
+    override fun onViewClick(view: View?) {
+        ++count
+        KLog.e(this@MainActivity.localClassName, "点击了$count 次")
+    }
 
+
+    private var exitTime = 0L
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
+            if (System.currentTimeMillis() - exitTime > 2000) {
+                toast("再按一次退出应用")
+                exitTime = System.currentTimeMillis()
+            } else {
+                ShiHuiActivityManager.getInstance().cleanActivity()
+            }
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }

@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class TimeUtil {
+    /** 点击事件时间间隔大于这个数字有效 */
+    public static long CLICKABLE_TIME = 500;
 
     /**
      * 格式化时间 如：12小时前
