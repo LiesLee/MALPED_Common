@@ -1,18 +1,15 @@
 package com.xiaodan.racinggame.http
 
-import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.support.v4.app.ActivityCompat
-import android.telephony.TelephonyManager
+import android.text.TextUtils
 import com.common.utils.MD5Util
-import com.common.utils.StringUtils
 import com.common.utils.UUID
 import com.gzqm.etcm.BuildConfig
 import com.gzqm.etcm.MyApplication
 import com.gzqm.etcm.R
 import com.gzqm.etcm.utils.SpUtil
+import com.socks.library.KLog
 import okhttp3.MediaType
 import java.util.*
 import okhttp3.MultipartBody
@@ -21,7 +18,7 @@ import java.io.File
 import kotlin.collections.ArrayList
 
 private fun getSignKey(): String =
-        if(BuildConfig.DEBUG) MyApplication.INSTANCE.resources.getString(R.string.sign_key)
+        if (BuildConfig.DEBUG) MyApplication.INSTANCE.resources.getString(R.string.sign_key)
         else MyApplication.INSTANCE.resources.getString(R.string.sign_key_release)
 
 /**
@@ -58,8 +55,8 @@ fun createParams(parameters: Map<String, Any>, urlName: String): SortedMap<Strin
 fun getParams(parameters: SortedMap<String, Any>): String {
     val sb = StringBuffer()
     val es = parameters.entries//所有参与传参的参数按照accsii排序（升序）
-    for((key, value) in es){
-        if(value!=null){
+    for ((key, value) in es) {
+        if (value != null) {
             sb.append("$key=$value&")
         }
     }
@@ -77,42 +74,88 @@ fun createSign(parameters: SortedMap<String, Any>): String {
 
 /** 生成的设备号  */
 val APP_DEVICEID_UUID = "App_Deviceid_UUID"
+//fun getDeviceId(): String? {
+//    var szImei: String? = null
+//    val telephonyMgr = MyApplication.INSTANCE.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//    if (ActivityCompat.checkSelfPermission(MyApplication.INSTANCE, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//        szImei = SpUtil.readString(APP_DEVICEID_UUID)
+//        if (StringUtils.isEmpty(szImei)) {
+//            szImei = UUID.randomUUID().toString()
+//            SpUtil.writeString(APP_DEVICEID_UUID, szImei)
+//        }
+//    } else {
+//        szImei = telephonyMgr.deviceId
+//    }
+//
+//    if (StringUtils.isEmpty(szImei)) {
+//        szImei = SpUtil.readString(APP_DEVICEID_UUID)
+//        if (StringUtils.isEmpty(szImei)) {
+//            szImei = UUID.randomUUID().toString()
+//            SpUtil.writeString(APP_DEVICEID_UUID, szImei)
+//        }
+//    }
+//    return szImei
+//}
+
 fun getDeviceId(): String? {
     var szImei: String? = null
-    val telephonyMgr = MyApplication.INSTANCE.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-    if (ActivityCompat.checkSelfPermission(MyApplication.INSTANCE, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-        szImei = SpUtil.readString(APP_DEVICEID_UUID)
-        if (StringUtils.isEmpty(szImei)) {
-            szImei = UUID.randomUUID().toString()
-            SpUtil.writeString(APP_DEVICEID_UUID, szImei)
-        }
-    } else {
-        szImei = telephonyMgr.deviceId
-    }
 
-    if (StringUtils.isEmpty(szImei)) {
-        szImei = SpUtil.readString(APP_DEVICEID_UUID)
-        if (StringUtils.isEmpty(szImei)) {
-            szImei = UUID.randomUUID().toString()
-            SpUtil.writeString(APP_DEVICEID_UUID, szImei)
-        }
-    }
+    szImei = SpUtil.readString(APP_DEVICEID_UUID)
+
+    if(!TextUtils.isEmpty(szImei)) return szImei
+
+    if (TextUtils.isEmpty(szImei))  szImei = getUniquePsuedoID()
+
+    if (TextUtils.isEmpty(szImei)) szImei = UUID.randomUUID().toString()
+
+    SpUtil.writeString(APP_DEVICEID_UUID, szImei)
     return szImei
 }
+
+
+//获得独一无二的Psuedo ID
+fun getUniquePsuedoID(): String {
+    var serial: String? = null
+    val m_szDevIDShort = "35" +
+            Build.BOARD.length % 10 + Build.BRAND.length % 10 +
+
+            Build.CPU_ABI.length % 10 + Build.DEVICE.length % 10 +
+
+            Build.DISPLAY.length % 10 + Build.HOST.length % 10 +
+
+            Build.ID.length % 10 + Build.MANUFACTURER.length % 10 +
+
+            Build.MODEL.length % 10 + Build.PRODUCT.length % 10 +
+
+            Build.TAGS.length % 10 + Build.TYPE.length % 10 +
+
+            Build.USER.length % 10 //13 位
+    try {
+        serial = android.os.Build::class.java.getField("SERIAL").get(null).toString()
+        //API>=9 使用serial号
+        return UUID(m_szDevIDShort.hashCode().toLong(), serial.hashCode().toLong()).toString()
+    } catch (exception: Exception) {
+        //serial需要一个初始化
+        serial = UUID.randomUUID().toString() // 随便一个初始化
+        KLog.e("","设备id  serial获取失败")
+    }
+
+    //使用硬件信息拼凑出来的15位号码
+    return UUID(m_szDevIDShort.hashCode().toLong(), serial!!.hashCode().toLong()).toString()
+}
+
 
 fun filesToMultipartBody(params: Map<String, Any>, paramsName: String, type: MediaType = MediaType.parse("image/jpg"), files: List<File>): MultipartBody {
     val builder = MultipartBody.Builder()
 
-    for (file in files){
+    for (file in files) {
         val requestBody = RequestBody.create(type, file)
         builder.addPart(MultipartBody.Part.createFormData(paramsName, file.name, requestBody))
     }
 
-    for((key, value) in params){
+    for ((key, value) in params) {
         builder.addPart(MultipartBody.Part.createFormData(key, value?.toString()))
     }
-
-
 
 
 //    for (file in files) {

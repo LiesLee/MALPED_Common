@@ -11,6 +11,7 @@ import com.common.annotation.ActivityFragmentInject
 import com.common.base.presenter.BasePresenterImpl
 import com.common.base.ui.BaseActivity
 import com.common.base.ui.BaseTakePhotoActivity
+import com.common.dialog.CommonDialog
 import com.gzqm.etcm.R
 import com.gzqm.etcm.module.home.ui.fragment.HomeFragment
 import com.gzqm.etcm.module.itinerary.ui.fragment.ItineraryFragment
@@ -95,10 +96,12 @@ class MainActivity : BaseActivity<BasePresenterImpl<*>>() {
 
         tv_title.setOnClickListener(this)
     }
-    var count = 0
+
     override fun onViewClick(view: View?) {
-        ++count
-        KLog.e(this@MainActivity.localClassName, "点击了$count 次")
+        when(view!!.id){
+            R.id.tv_title -> CommonDialog.show2btnDialog(baseActivity, "提示", "取消", "确认",false,{},{ toast("确认")})
+        }
+
     }
 
 

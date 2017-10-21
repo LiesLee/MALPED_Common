@@ -51,13 +51,18 @@
         android:supportsRtl="true"
         android:name=".MyApplication"
         android:theme="@style/AppTheme">
-        <activity android:name=".module.common.ui.activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+        <activity android:name=".module.common.ui.activity.LauncherActivity" android:theme="@style/AppThemeStartTransparent" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".module.common.ui.activity.MainActivity" android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>z
     </application>
 
 </manifest>

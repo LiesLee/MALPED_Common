@@ -1,1 +1,1 @@
-include ':ETC-M_App', ':CommonLibrary'
+include ':ETC-M_App', ':CommonLibrary', ':CommonDialog'

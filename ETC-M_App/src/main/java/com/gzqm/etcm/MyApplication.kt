@@ -20,7 +20,7 @@ class MyApplication : MultiDexApplication(){
         @Volatile lateinit var INSTANCE: MyApplication
     }
 
-    public fun initSdks(){
+    fun initSdks(){
         KLog.init(BuildConfig.DEBUG)
     }
 }

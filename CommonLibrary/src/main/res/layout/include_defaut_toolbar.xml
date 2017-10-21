@@ -3,7 +3,7 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary">
+    android:background="@dimen/toolbar_height">
 
     <LinearLayout
         android:id="@+id/ll_goback"

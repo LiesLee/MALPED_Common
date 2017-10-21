@@ -82,12 +82,12 @@ dependencies {
     })
     compile project(':CommonLibrary')
     // -------------------- 二维码三个库 ----------------------------
-//    compile 'com.google.zxing:core:3.3.0'
-//    compile 'cn.bingoogolapple:bga-qrcodecore:1.1.9@aar'
-//    compile 'cn.bingoogolapple:bga-zxing:1.1.9@aar'
+    //    compile 'com.google.zxing:core:3.3.0'
+    //    compile 'cn.bingoogolapple:bga-qrcodecore:1.1.9@aar'
+    //    compile 'cn.bingoogolapple:bga-zxing:1.1.9@aar'
     // -------------------- 二维码三个库 ----------------------------
-
     testCompile 'junit:junit:4.12'
+    compile project(':CommonDialog')
 }
 //强制选择support libraty版本，避免出现+号导入的ahpha版
 configurations.all {

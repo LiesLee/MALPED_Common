@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.chad.library.adapter.base.loadmore.LoadMoreView;
 import com.common.base.R;
 
 import com.common.utils.TimeUtil;
+import com.common.utils.UUID;
 import com.views.util.ViewUtil;
 
 import me.dkzwm.widget.srl.SmoothRefreshLayout;
@@ -28,7 +30,9 @@ import me.dkzwm.widget.srl.utils.PixelUtl;
  * Email: LiesLee@foxmail.com
  */
 public class ViewsHelper {
-    /** 大于这个数开启adapter加载更多 */
+    /**
+     * 大于这个数开启adapter加载更多
+     */
     public static int OPEN_LOAD_MORE_SIZE = 5;
 
     public static <T extends SmoothRefreshLayout.OnRefreshListener> SmoothRefreshLayout initSmoothRefreshLayoutByMaterial
@@ -43,8 +47,8 @@ public class ViewsHelper {
         smoothRefreshLayout.setDisableWhenHorizontalMove(true);
         smoothRefreshLayout.setEnableCheckFingerInsideHorView(true);
         smoothRefreshLayout.setEnableOverScroll(true);//越界回弹
-        smoothRefreshLayout.setOverScrollDurationRatio(0.3f);
-        smoothRefreshLayout.setMaxOverScrollDuration(300);
+        smoothRefreshLayout.setOverScrollDurationRatio(0.2f);
+        smoothRefreshLayout.setMaxOverScrollDuration(200);
         smoothRefreshLayout.setOnRefreshListener(listener);
         return smoothRefreshLayout;
     }
@@ -144,7 +148,7 @@ public class ViewsHelper {
         TextView tv_tips = (TextView) default_loading_dialog.findViewById(R.id.tv_tips);
         progressWheel.setBarWidth(ViewUtil.dip2px(4, context));
 
-        progressWheel.setBarColor(context.getResources().getColor(R.color.cus_blue));
+        progressWheel.setBarColor(context.getResources().getColor(R.color.colorAccent));
         ll_root.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_default_dialog_bg_white));
         tv_tips.setTextColor(context.getResources().getColor(R.color.grey));
 
@@ -174,7 +178,7 @@ public class ViewsHelper {
         TextView tv_tips = (TextView) default_loading_dialog.findViewById(R.id.tv_tips);
         progressWheel.setBarWidth(ViewUtil.dip2px(4, context));
 
-        progressWheel.setBarColor(context.getResources().getColor(R.color.cus_blue));
+        progressWheel.setBarColor(context.getResources().getColor(R.color.colorAccent));
         ll_root.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_default_dialog_bg_white));
         tv_tips.setTextColor(context.getResources().getColor(R.color.grey));
 
@@ -212,3 +216,4 @@ class MyLoadMoreView extends LoadMoreView {
         return 0;
     }
 }
+
